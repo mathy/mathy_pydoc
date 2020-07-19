@@ -1,3 +1,11 @@
+## [0.7.18](https://github.com/mathy/mathy_pydoc/compare/v0.7.17...v0.7.18) (2020-07-19)
+
+
+### Bug Fixes
+
+* **ci:** bump version after pypi step ([69bfd5f](https://github.com/mathy/mathy_pydoc/commit/69bfd5f164cf633df6a3466c656014c96a314a5a))
+* **ci:** do version increment during deploy step ([be7be55](https://github.com/mathy/mathy_pydoc/commit/be7be55bd3eab4dad6cea34d8e333f58bec21d62))
+
 ## [0.7.17](https://github.com/mathy/mathy_pydoc/compare/v0.7.16...v0.7.17) (2020-07-19)
 
 
