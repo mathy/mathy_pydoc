@@ -1,3 +1,10 @@
+## [0.7.16](https://github.com/mathy/mathy_pydoc/compare/v0.7.15...v0.7.16) (2020-07-19)
+
+
+### Bug Fixes
+
+* **ci:** wrong repo was used in set-build-version ([608869b](https://github.com/mathy/mathy_pydoc/commit/608869b0880bedd3a36bfe62b353a69552338d2f))
+
 ## [0.7.15](https://github.com/mathy/mathy_pydoc/compare/v0.7.14...v0.7.15) (2020-07-19)
 
 
