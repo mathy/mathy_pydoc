@@ -1,3 +1,10 @@
+## [0.7.17](https://github.com/mathy/mathy_pydoc/compare/v0.7.16...v0.7.17) (2020-07-19)
+
+
+### Bug Fixes
+
+* **ci:** remove json file version incrementing ([4f78333](https://github.com/mathy/mathy_pydoc/commit/4f7833385e942f4f12da43d4dd1f8a8673395b89))
+
 ## [0.7.16](https://github.com/mathy/mathy_pydoc/compare/v0.7.15...v0.7.16) (2020-07-19)
 
 
