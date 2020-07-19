@@ -6,7 +6,6 @@ matrix:
         - nvm install 10.18
         - nvm use 10.18      
       before_script:
-        - npm install && npx ts-node tools/set-build-version.ts
         - sh tools/setup.sh
       script:
         - sh tools/test.sh
