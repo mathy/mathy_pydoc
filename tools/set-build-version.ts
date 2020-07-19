@@ -12,7 +12,7 @@ function getBuildVersion() {
       // Core options
       dryRun: true,
       branch: "master",
-      repositoryUrl: "https://github.com/justindujardin/mathy.git",
+      repositoryUrl: "https://github.com/mathy/mathy_pydoc.git",
     },
     {
       cwd: "./",
