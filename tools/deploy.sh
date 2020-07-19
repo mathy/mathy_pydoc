@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+echo "Running semantic-release"
+npx semantic-release
+
 . .env/bin/activate
 git config --global user.email "justin@dujardinconsulting.com"
 git config --global user.name "justindujardin"
