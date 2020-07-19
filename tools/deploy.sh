@@ -1,12 +1,7 @@
 #!/bin/bash
 set -e
-echo "Installing semantic-release requirements"
-npm install 
-echo "Updating build version"
-npx ts-node tools/set-build-version.ts
-echo "Running semantic-release"
-npx semantic-release
 
+# Build and deploy python package
 . .env/bin/activate
 git config --global user.email "justin@dujardinconsulting.com"
 git config --global user.name "justindujardin"
@@ -24,3 +19,16 @@ echo "--- Upload to PyPi"
 set +e
 twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} dist/*
 rm -rf build dist
+
+
+# The build/deploy step runs in two commits. The first runs the tests and generates a
+# tag commit, and that tag commit deploys to pypi. To make this work we do the pypi
+# bit first, then run semantic-release to bump versions and generate a new commit. This
+# way the package is always published from the tag commit, and not accidentally by the
+# initiating change because the version was already bumped.
+echo "Installing semantic-release requirements"
+npm install 
+echo "Updating build version"
+npx ts-node tools/set-build-version.ts
+echo "Running semantic-release"
+npx semantic-release
