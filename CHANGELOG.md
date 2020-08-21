@@ -1,3 +1,10 @@
+## [0.7.19](https://github.com/mathy/mathy_pydoc/compare/v0.7.18...v0.7.19) (2020-08-21)
+
+
+### Bug Fixes
+
+* **markdown:** support ForwardRef stripping ([a4f44a8](https://github.com/mathy/mathy_pydoc/commit/a4f44a8db8ccf9223f5845758b5c02449eb3f63a))
+
 ## [0.7.18](https://github.com/mathy/mathy_pydoc/compare/v0.7.17...v0.7.18) (2020-07-19)
 
 
