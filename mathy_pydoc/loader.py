@@ -46,7 +46,7 @@ optional_match = r"(.*)Union\[(.*),\sNoneType\](.*)"
 optional_replace = r"\1Optional[\2]\3"
 
 # _ForwardRef('MathyEnvState') -> MathyEnvState
-fwd_ref_match = r"(.*)\_ForwardRef\(\'(.*)\'\)(.*)"
+fwd_ref_match = r"(.*)\_?ForwardRef\(\'(.*)\'\)(.*)"
 fwd_ref_replace = r"\1\2\3"
 
 
@@ -216,8 +216,6 @@ def get_function_signature(
     indent: int = 4,
     max_width: int = 82,
 ) -> str:
-    isclass = inspect.isclass(function)
-
     placeholder: CallablePlaceholder = get_callable_placeholder(
         function=function, owner_class=owner_class, show_module=show_module
     )
