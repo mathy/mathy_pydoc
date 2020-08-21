@@ -1,6 +1,13 @@
 from typing import List, Optional, Tuple, Dict, Any
 
 
+def a_function_with_optional_return(
+    optional: Optional[str],
+) -> Optional[str]:
+    """Sweet typed function"""
+    pass
+
+
 def a_function_with_types(
     optional: Optional[str],
     nested_optional: Optional[Tuple[Optional[str], Optional[int]]],

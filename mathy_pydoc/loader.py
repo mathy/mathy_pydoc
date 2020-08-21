@@ -25,11 +25,13 @@ that name, but is not supposed to apply preprocessing.
 """
 
 from __future__ import print_function
-from .imp import import_object_with_scope
+
 import inspect
-import types
-from typing import Callable, Optional, List, Any
 import re
+import types
+from typing import Any, Callable, List, Optional
+
+from .imp import import_object_with_scope
 
 function_types = (
     types.FunctionType,
@@ -199,9 +201,7 @@ def get_callable_placeholder(
 
     return_annotation = None
     if sig.return_annotation is not inspect._empty:  # type: ignore
-        return_annotation = inspect.formatannotation(
-            sig.return_annotation, base_module="mathy"
-        )
+        return_annotation = inspect.formatannotation(sig.return_annotation)
     if return_annotation is not None:
         return_annotation = cleanup_type(return_annotation)
     return CallablePlaceholder(
@@ -221,20 +221,28 @@ def get_function_signature(
     )
 
     out_str = placeholder.name + placeholder.simple
-    if len(out_str) < max_width:
-        return out_str
-    out_str = f"{placeholder.name}(\n"
+    sep = ""
+    indent_str = ""
+    long_line: bool = len(out_str) >= max_width
+    if long_line:
+        sep = "\n"
+        indent_str = " " * indent
+
+    out_str = f"{placeholder.name}({sep}"
     arg: CallableArg
-    indent = " " * indent
     for arg in placeholder.args:
-        arg_str = f"{indent}{arg.name}"
+        arg_str = f"{indent_str}{arg.name}"
         if arg.type_hint is not None:
             arg_str += f": {arg.type_hint}"
         if arg.default is not None:
             arg_str += f" = {arg.default}"
-        arg_str += ",\n"
+        arg_str += f", {sep}"
         out_str += arg_str
-    out_str += f")"
+
+    # Remove trailing comma on single-line fns
+    if not long_line and out_str[-2:] == ", ":
+        out_str = out_str[0:-2]
+    out_str += ")"
     if placeholder.return_type is not None:
         out_str += f" -> {placeholder.return_type}"
 
