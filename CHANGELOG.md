@@ -1,3 +1,10 @@
+## [0.7.20](https://github.com/mathy/mathy_pydoc/compare/v0.7.19...v0.7.20) (2020-08-21)
+
+
+### Bug Fixes
+
+* **markdown:** issue where return types were not cleaned up on short functions ([b0e9f0f](https://github.com/mathy/mathy_pydoc/commit/b0e9f0f08356ac983d0a280cefc4f740717d65ba))
+
 ## [0.7.19](https://github.com/mathy/mathy_pydoc/compare/v0.7.18...v0.7.19) (2020-08-21)
 
 
