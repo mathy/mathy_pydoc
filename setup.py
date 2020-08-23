@@ -60,6 +60,11 @@ setuptools.setup(
     ],
     keywords="markdown pydoc generator docs documentation",
     packages=["mathy_pydoc"],
-    install_requires=["Markdown>=2.6.11", "PyYAML>=3.12", "six>=0.11.0",],
-    entry_points=dict(console_scripts=["mathy_pydoc=mathy_pydoc.__main__:main"]),
+    install_requires=[
+        "typer>=0.3.2,<0.4.0",
+        "Markdown>=2.6.11",
+        'dataclasses>=0.6,<1.0; python_version < "3.7"',
+        'typing_extensions>=3.7.4.1,<4.0.0.0; python_version < "3.7"',
+    ],
+    entry_points=dict(console_scripts=["mathy_pydoc=mathy_pydoc.cli:app"]),
 )

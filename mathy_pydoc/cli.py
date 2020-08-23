@@ -1,43 +1,17 @@
-# Copyright (c) 2017  Niklas Rosenstein
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-
-from __future__ import print_function
-from .document import Index
-from .imp import import_object, dir_object
-from argparse import ArgumentParser
-
-import atexit
-import os
-import shutil
-import signal
-import subprocess
 import sys
-import yaml
+from typing import Dict, List, Union
 
+import typer
 
-parser = ArgumentParser()
-parser.add_argument("subargs", nargs="...")
+from .document import Document, Index
+from .imp import dir_object
+from .loader import PythonLoader
+from .preprocessor import Preprocessor
+
+app = typer.Typer()
 
 
 def default_config(config):
-    args = parser.parse_args()
     config.setdefault("sort", "name")
     config.setdefault("headers", "markdown")
     config.setdefault("theme", "readthedocs")
@@ -47,53 +21,28 @@ def default_config(config):
     return config
 
 
-def makedirs(path):
-    """Create the directory *path* if it does not already exist."""
-
-    if not os.path.isdir(path):
-        os.makedirs(path)
-
-
 def log(*args, **kwargs):
     kwargs.setdefault("file", sys.stderr)
     print(*args, **kwargs)
 
 
-def main():
-    args = parser.parse_args()
+@app.command()
+def main(names: List[str]):
+    names = list(names)
     config = default_config({})
-    # Parse options.
-    modspecs = []
-    it = iter(args.subargs)
-    while True:
-        try:
-            value = next(it)
-        except StopIteration:
-            break
-        if value == "-c":
-            try:
-                value = next(it)
-            except StopIteration:
-                parser.error("missing value to option -c")
-            key, value = value.partition("=")[::2]
-            if value.startswith("["):
-                if not value.endswith("]"):
-                    parser.error("invalid option value: {!r}".format(value))
-                    value = value[1:-1].split(",")
-            config[key] = value
-        else:
-            modspecs.append(value)
-    args.subargs = modspecs
-
-    loader = import_object(config["loader"])(config)
-    preproc = import_object(config["preprocessor"])(config)
+    loader = PythonLoader(config)
+    preproc = Preprocessor(config)
 
     # Build the index and document structure first, we load the actual
     # docstrings at a later point.
     log("Building index...")
     index = Index()
 
-    def add_sections(doc, object_names, depth=1):
+    def add_sections(
+        doc: Document,
+        object_names: Union[List[str], Dict[str, str], str],
+        depth: int = 1,
+    ):
         if isinstance(object_names, list):
             [add_sections(doc, x, depth) for x in object_names]
         elif isinstance(object_names, dict):
@@ -121,7 +70,7 @@ def main():
                 need_docstrings = "docstring" in config.get("filter", ["docstring"])
                 for sub in dir_object(name, sort_order, need_docstrings):
                     sub = name + "." + sub
-                    sec = create_sections(sub, level + 1)
+                    create_sections(sub, level + 1)
 
             create_sections(object_names, 0)
         else:
@@ -133,7 +82,7 @@ def main():
 
     # Generate a single document from the import names specified on the command-line.
     doc = index.new_document("main.md")
-    add_sections(doc, args.subargs)
+    add_sections(doc, names)
 
     # Load the docstrings and fill the sections.
     log("Started generating documentation...")
@@ -148,5 +97,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-
+    typer.run(main)

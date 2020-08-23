@@ -1,22 +1,3 @@
-# Copyright (c) 2017  Niklas Rosenstein
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
 """
 This module provides implementations to load documentation information from
 an identifier as it is specified in the `pydocmd.yml:generate` configuration
@@ -26,12 +7,21 @@ that name, but is not supposed to apply preprocessing.
 
 from __future__ import print_function
 
+import dataclasses
 import inspect
 import re
+import sys
 import types
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 from .imp import import_object_with_scope
+
+# Use typing_extensions for Python < 3.8
+if sys.version_info < (3, 8):
+    from typing_extensions import Literal
+else:
+    from typing import Literal  # noqa
+
 
 function_types = (
     types.FunctionType,
@@ -50,6 +40,14 @@ optional_replace = r"\1Optional[\2]\3"
 # _ForwardRef('MathyEnvState') -> MathyEnvState
 fwd_ref_match = r"(.*)\_?ForwardRef\(\'(.*)\'\)(.*)"
 fwd_ref_replace = r"\1\2\3"
+
+FunctionTypes = Union[
+    Literal["class"],
+    Literal["function"],
+    Literal["dataclass"],
+    Literal["classmethod"],
+    Literal["method"],
+]
 
 
 def cleanup_type(type_string: str) -> str:
@@ -118,8 +116,11 @@ class PythonLoader(object):
 
         # Add the function signature in a code-block.
         if callable(obj):
-            sig = get_function_signature(obj, scope if inspect.isclass(scope) else None)
-            section.content = "```python\n{}\n```\n".format(sig) + section.content
+            sig, fn_type = get_function_signature(
+                obj, scope if inspect.isclass(scope) else None
+            )
+            section.content = f"```python\n{sig}\n```\n{section.content}"
+            section.title = f"{section.title} <kbd>{fn_type}</kbd>"
 
 
 def get_docstring(function):
@@ -147,24 +148,51 @@ class CallablePlaceholder:
     name: str
     args: List[CallableArg]
     return_type: Optional[str]
+    fn_type: FunctionTypes
 
     def __init__(
         self,
         simple: str,
         name: str,
         args: List[CallableArg],
+        fn_type: FunctionTypes,
         return_type: Optional[Any] = None,
     ):
         self.simple = simple
         self.name = name
         self.args = args
         self.return_type = return_type
+        self.fn_type = fn_type
+
+
+def get_fn_type(function: Any) -> FunctionTypes:
+    sig: inspect.Signature = inspect.signature(function)
+    is_class = inspect.isclass(function)
+    is_method = inspect.ismethod(function)
+    is_function = inspect.isfunction(function)
+    is_dataclass = dataclasses.is_dataclass(function)
+    prms = [p.name for p in list(sig.parameters.values())]
+    fn_type: FunctionTypes
+    if is_method and not is_function:
+        fn_type = "classmethod"
+    elif is_dataclass:
+        fn_type = "dataclass"
+    elif is_method or is_function and len(prms) > 0 and prms[0] == "self":
+        fn_type = "method"
+    elif is_function:
+        fn_type = "function"
+    elif is_class:
+        fn_type = "class"
+    else:
+        raise ValueError(f"unknown type of function: {function}")
+    return fn_type
 
 
 def get_callable_placeholder(
     function: Callable, owner_class=None, show_module=False
 ) -> CallablePlaceholder:
     isclass = inspect.isclass(function)
+    orig_fn = function
 
     # Get base name.
     name_parts = []
@@ -183,6 +211,7 @@ def get_callable_placeholder(
 
     name = ".".join(name_parts)
     sig = inspect.signature(function)
+    fn_type: FunctionTypes = get_fn_type(orig_fn)
 
     params = []
     for p in sig.parameters.values():
@@ -205,7 +234,11 @@ def get_callable_placeholder(
     if return_annotation is not None:
         return_annotation = cleanup_type(return_annotation)
     return CallablePlaceholder(
-        simple=str(sig), name=name, args=params, return_type=return_annotation
+        simple=str(sig),
+        name=name,
+        args=params,
+        return_type=return_annotation,
+        fn_type=fn_type,
     )
 
 
@@ -215,7 +248,8 @@ def get_function_signature(
     show_module: bool = False,
     indent: int = 4,
     max_width: int = 82,
-) -> str:
+) -> Tuple[str, str]:
+    """Return a tuple of the function signature and its function type string"""
     placeholder: CallablePlaceholder = get_callable_placeholder(
         function=function, owner_class=owner_class, show_module=show_module
     )
@@ -246,4 +280,4 @@ def get_function_signature(
     if placeholder.return_type is not None:
         out_str += f" -> {placeholder.return_type}"
 
-    return out_str
+    return out_str, placeholder.fn_type
