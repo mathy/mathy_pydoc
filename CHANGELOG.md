@@ -1,3 +1,10 @@
+## [0.7.21](https://github.com/mathy/mathy_pydoc/compare/v0.7.20...v0.7.21) (2020-08-23)
+
+
+### Features
+
+* add function types to api docs ([75bc770](https://github.com/mathy/mathy_pydoc/commit/75bc770188e0db6e3fe07d913c3ae3a08b243940))
+
 ## [0.7.20](https://github.com/mathy/mathy_pydoc/compare/v0.7.19...v0.7.20) (2020-08-21)
 
 
