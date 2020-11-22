@@ -119,7 +119,7 @@ class PythonLoader(object):
             sig, fn_type = get_function_signature(
                 obj, scope if inspect.isclass(scope) else None
             )
-            section.content = f"```python\n{sig}\n```\n{section.content}"
+            section.content = f"```python (doc)\n{sig}\n```\n{section.content}"
             section.title = f"{section.title} <kbd>{fn_type}</kbd>"
 
 
