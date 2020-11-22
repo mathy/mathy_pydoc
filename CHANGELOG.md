@@ -1,3 +1,10 @@
+## [0.7.22](https://github.com/mathy/mathy_pydoc/compare/v0.7.21...v0.7.22) (2020-11-22)
+
+
+### Features
+
+* mark python doc pseudo-code blocks with a tag ([1562fa8](https://github.com/mathy/mathy_pydoc/commit/1562fa890911ec20590391804dd28b4fbb85f0bb))
+
 ## [0.7.21](https://github.com/mathy/mathy_pydoc/compare/v0.7.20...v0.7.21) (2020-08-23)
 
 
