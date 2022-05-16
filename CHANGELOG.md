@@ -1,3 +1,10 @@
+## [0.7.26](https://github.com/mathy/mathy_pydoc/compare/v0.7.25...v0.7.26) (2022-05-16)
+
+
+### Bug Fixes
+
+* deploy updated package on merge ([8ff1f84](https://github.com/mathy/mathy_pydoc/commit/8ff1f8463eafe6d1effe5e4a06507678e15b4627))
+
 ## [0.7.25](https://github.com/mathy/mathy_pydoc/compare/v0.7.24...v0.7.25) (2022-05-16)
 
 
