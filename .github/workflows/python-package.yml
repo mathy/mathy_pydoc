@@ -28,7 +28,6 @@ jobs:
         run: sh tools/build.sh
       - name: Test Wheel
         run: sh tools/test.sh
-      - name: Report Code Coverage
 
   deploy:
     runs-on: ubuntu-latest
