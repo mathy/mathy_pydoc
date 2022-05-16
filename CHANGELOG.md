@@ -1,3 +1,10 @@
+## [0.7.27](https://github.com/mathy/mathy_pydoc/compare/v0.7.26...v0.7.27) (2022-05-16)
+
+
+### Features
+
+* make typer range larger ([fd59273](https://github.com/mathy/mathy_pydoc/commit/fd592737d9c68d6fc5a6650d573367e023dd4ae9))
+
 ## [0.7.26](https://github.com/mathy/mathy_pydoc/compare/v0.7.25...v0.7.26) (2022-05-16)
 
 
