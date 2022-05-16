@@ -1,3 +1,10 @@
+## [0.7.25](https://github.com/mathy/mathy_pydoc/compare/v0.7.24...v0.7.25) (2022-05-16)
+
+
+### Features
+
+* ridiculous change ([9e92b12](https://github.com/mathy/mathy_pydoc/commit/9e92b1291467ca2ba3a65f8b8434088505826d0b))
+
 ## [0.7.24](https://github.com/mathy/mathy_pydoc/compare/v0.7.23...v0.7.24) (2022-05-16)
 
 
