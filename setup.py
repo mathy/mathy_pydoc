@@ -61,7 +61,7 @@ setuptools.setup(
     keywords="markdown pydoc generator docs documentation",
     packages=["mathy_pydoc"],
     install_requires=[
-        "typer>=0.4.0,<0.5.0",
+        "typer>=0.3.0,<0.5.0",
         "Markdown>=2.6.11",
         'dataclasses>=0.6,<1.0; python_version < "3.7"',
         'typing_extensions>=3.7.4.1,<4.0.0.0; python_version < "3.7"',
