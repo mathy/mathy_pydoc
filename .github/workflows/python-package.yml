@@ -27,11 +27,8 @@ jobs:
       - name: Build Wheel
         run: sh tools/build.sh
       - name: Test Wheel
-        run: rm -rf ./pathy/ && sh tools/test_package.sh
+        run: sh tools/test.sh
       - name: Report Code Coverage
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: sh tools/codecov.sh
 
   deploy:
     runs-on: ubuntu-latest
