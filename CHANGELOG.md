@@ -1,3 +1,10 @@
+## [0.7.23](https://github.com/mathy/mathy_pydoc/compare/v0.7.22...v0.7.23) (2022-05-16)
+
+
+### Features
+
+* add github actions for CI build ([e41a309](https://github.com/mathy/mathy_pydoc/commit/e41a309a9e3f2e297d0d9f47c8b415e8e8c30573))
+
 ## [0.7.22](https://github.com/mathy/mathy_pydoc/compare/v0.7.21...v0.7.22) (2020-11-22)
 
 
