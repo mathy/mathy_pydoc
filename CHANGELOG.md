@@ -1,3 +1,10 @@
+## [0.7.24](https://github.com/mathy/mathy_pydoc/compare/v0.7.23...v0.7.24) (2022-05-16)
+
+
+### Features
+
+* update typer to 0.4.x ([65e1ce3](https://github.com/mathy/mathy_pydoc/commit/65e1ce3dad1ebad9478f80d74892f6dd4638756c))
+
 ## [0.7.23](https://github.com/mathy/mathy_pydoc/compare/v0.7.22...v0.7.23) (2022-05-16)
 
 
