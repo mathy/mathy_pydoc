@@ -1,3 +1,10 @@
+## [0.7.28](https://github.com/mathy/mathy_pydoc/compare/v0.7.27...v0.7.28) (2023-01-05)
+
+
+### Features
+
+* **requirements:** loosen typer requirement ([6ca0c33](https://github.com/mathy/mathy_pydoc/commit/6ca0c33661692f767ab5e867e738c08c4b51b717))
+
 ## [0.7.27](https://github.com/mathy/mathy_pydoc/compare/v0.7.26...v0.7.27) (2022-05-16)
 
 
