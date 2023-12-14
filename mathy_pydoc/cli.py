@@ -5,7 +5,7 @@ import typer
 
 from .document import Document, Index
 from .imp import dir_object
-from .loader import PythonLoader
+from .loader import LoaderConfig, PythonLoader
 from .preprocessor import Preprocessor
 
 app = typer.Typer()
@@ -27,10 +27,10 @@ def log(*args, **kwargs):
 
 
 @app.command()
-def main(names: List[str]):
+def main(names: List[str], plain: bool = False):
     names = list(names)
     config = default_config({})
-    loader = PythonLoader(config)
+    loader = PythonLoader(LoaderConfig(plain=plain))
     preproc = Preprocessor(config)
 
     # Build the index and document structure first, we load the actual

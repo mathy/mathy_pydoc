@@ -50,6 +50,12 @@ FunctionTypes = Union[
 ]
 
 
+@dataclasses.dataclass
+class LoaderConfig:
+    # When true don't include (doc) in the codeblock label and a <kbd> tag
+    plain: bool = False
+
+
 def cleanup_type(type_string: str) -> str:
     # Optional[T] gets expanded to Union[T, NoneType], so change it back
     while re.search(optional_match, type_string) is not None:
@@ -85,22 +91,24 @@ def trim(docstring):
 
 class PythonLoader(object):
     """
-  Expects absolute identifiers to import with #import_object_with_scope().
-  """
+    Expects absolute identifiers to import with #import_object_with_scope().
+    """
 
-    def __init__(self, config):
+    config: LoaderConfig
+
+    def __init__(self, config: LoaderConfig):
         self.config = config
 
     def load_section(self, section):
         """
-    Loads the contents of a #Section. The `section.identifier` is the name
-    of the object that we need to load.
+        Loads the contents of a #Section. The `section.identifier` is the name
+        of the object that we need to load.
 
-    # Arguments
-      section (Section): The section to load. Fill the `section.title` and
-        `section.content` values. Optionally, `section.loader_context` can
-        be filled with custom arbitrary data to reference at a later point.
-    """
+        # Arguments
+          section (Section): The section to load. Fill the `section.title` and
+            `section.content` values. Optionally, `section.loader_context` can
+            be filled with custom arbitrary data to reference at a later point.
+        """
 
         assert section.identifier is not None
         obj, scope = import_object_with_scope(section.identifier)
@@ -119,8 +127,13 @@ class PythonLoader(object):
             sig, fn_type = get_function_signature(
                 obj, scope if inspect.isclass(scope) else None
             )
-            section.content = f"```python (doc)\n{sig}\n```\n{section.content}"
-            section.title = f"{section.title} <kbd>{fn_type}</kbd>"
+            type_append = ""
+            label_append = ""
+            if not self.config.plain:
+                type_append = " (doc)"
+                label_append = f" <kbd>{fn_type}</kbd>"
+            section.content = f"```python{type_append}\n{sig}\n```\n{section.content}"
+            section.title = f"{section.title}{label_append}"
 
 
 def get_docstring(function):
