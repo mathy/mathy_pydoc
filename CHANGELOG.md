@@ -1,3 +1,10 @@
+## [0.7.30](https://github.com/mathy/mathy_pydoc/compare/v0.7.29...v0.7.30) (2023-12-14)
+
+
+### Features
+
+* **pypi:** loosen typer range ([6f5ad4d](https://github.com/mathy/mathy_pydoc/commit/6f5ad4d9b9690a32963220dfe9c67edfe3bdd85a))
+
 ## [0.7.29](https://github.com/mathy/mathy_pydoc/compare/v0.7.28...v0.7.29) (2023-12-14)
 
 
