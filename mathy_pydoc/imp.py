@@ -21,11 +21,12 @@
 This module provides utilities for importing Python objects by name.
 """
 
-import types
 import inspect
+import types
+from typing import Any
 
 
-def import_module(name):
+def import_module(name: str) -> types.ModuleType:
     """
   Imports a Python module assuming that the whole *name* identifies only a
   Python module and no symbol inside a Python module.
@@ -36,7 +37,7 @@ def import_module(name):
     return __import__(name, fromlist=[""])
 
 
-def import_object(name):
+def import_object(name: str) -> Any:
     """
   Like #import_object_with_scope() but returns only the object.
   """
@@ -44,7 +45,7 @@ def import_object(name):
     return import_object_with_scope(name)[0]
 
 
-def import_object_with_scope(name):
+def import_object_with_scope(name: str) -> tuple[Any, Any]:
     """
   Imports a Python object by an absolute identifier.
 
@@ -62,7 +63,7 @@ def import_object_with_scope(name):
     parts = name.split(".")
     current_name = parts[0]
     obj = import_module(current_name)
-    scope = None
+    scope: Any = None
     for part in parts[1:]:
         current_name += "." + part
         try:
@@ -78,7 +79,7 @@ def import_object_with_scope(name):
     return obj, scope
 
 
-def force_lazy_import(name):
+def force_lazy_import(name: str) -> None:
     """
   Import any modules off of "name" by iterating a new list rather than a generator so that this
   library works with lazy imports.
@@ -90,8 +91,10 @@ def force_lazy_import(name):
             import_object(name + "." + key)
 
 
-def dir_object(name, sort_order, need_docstrings=True):
-    prefix = None
+def dir_object(
+    name: str, sort_order: str, need_docstrings: bool = True
+) -> list[str]:
+    prefix: str | None = None
     obj = import_object(name)
     if isinstance(obj, types.ModuleType):
         prefix = obj.__name__
@@ -101,8 +104,8 @@ def dir_object(name, sort_order, need_docstrings=True):
     # the block below will fail because the object will change while it's being iterated.
     force_lazy_import(name)
 
-    by_name = []
-    by_lineno = []
+    by_name: list[str] = []
+    by_lineno: list[tuple[str, int]] = []
     for key, value in getattr(obj, "__dict__", {}).items():
         if isinstance(value, (staticmethod, classmethod)):
             value = value.__func__
@@ -133,6 +136,6 @@ def dir_object(name, sort_order, need_docstrings=True):
         else:
             by_name.append(key)
     by_name = sorted(by_name, key=lambda s: s.lower())
-    by_lineno = [key for key, lineno in sorted(by_lineno, key=lambda r: r[1])]
+    by_lineno_sorted = [key for key, lineno in sorted(by_lineno, key=lambda r: r[1])]
 
-    return by_name + by_lineno
+    return by_name + by_lineno_sorted

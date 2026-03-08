@@ -8,9 +8,6 @@ venv[23]/
 test.md
 dist/
 README.rst
-Pipfile
-Pipfile.lock
 .idea
 .pytest_cache/
-.env
-node_modules/
+uv.lock

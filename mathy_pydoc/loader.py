@@ -5,23 +5,14 @@ key. A loader basically takes care of loading the documentation content for
 that name, but is not supposed to apply preprocessing.
 """
 
-from __future__ import print_function
-
 import dataclasses
 import inspect
 import re
-import sys
 import types
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import Any, Callable, Literal, Optional, Union
 
+from .document import Section
 from .imp import import_object_with_scope
-
-# Use typing_extensions for Python < 3.8
-if sys.version_info < (3, 8):
-    from typing_extensions import Literal
-else:
-    from typing import Literal  # noqa
-
 
 function_types = (
     types.FunctionType,
@@ -30,8 +21,6 @@ function_types = (
     types.BuiltinFunctionType,
     types.BuiltinMethodType,
 )
-if hasattr(types, "UnboundMethodType"):
-    function_types += (types.UnboundMethodType,)
 
 # Union[MathyEnvState, NoneType] -> Optional[MathyEnvState]
 optional_match = r"(.*)Union\[(.*),\sNoneType\](.*)"
@@ -41,13 +30,7 @@ optional_replace = r"\1Optional[\2]\3"
 fwd_ref_match = r"(.*)\_?ForwardRef\(\'(.*)\'\)(.*)"
 fwd_ref_replace = r"\1\2\3"
 
-FunctionTypes = Union[
-    Literal["class"],
-    Literal["function"],
-    Literal["dataclass"],
-    Literal["classmethod"],
-    Literal["method"],
-]
+FunctionTypes = Literal["class", "function", "dataclass", "classmethod", "method"]
 
 
 @dataclasses.dataclass
@@ -68,13 +51,13 @@ def cleanup_type(type_string: str) -> str:
     return type_string
 
 
-def trim(docstring):
+def trim(docstring: str) -> str:
     if not docstring:
         return ""
     lines = [x.rstrip() for x in docstring.split("\n")]
     lines[0] = lines[0].lstrip()
 
-    indent = None
+    indent: Optional[int] = None
     for i, line in enumerate(lines):
         if i == 0 or not line:
             continue
@@ -89,17 +72,17 @@ def trim(docstring):
     return "\n".join(lines)
 
 
-class PythonLoader(object):
+class PythonLoader:
     """
     Expects absolute identifiers to import with #import_object_with_scope().
     """
 
     config: LoaderConfig
 
-    def __init__(self, config: LoaderConfig):
+    def __init__(self, config: LoaderConfig) -> None:
         self.config = config
 
-    def load_section(self, section):
+    def load_section(self, section: Section) -> None:
         """
         Loads the contents of a #Section. The `section.identifier` is the name
         of the object that we need to load.
@@ -136,7 +119,7 @@ class PythonLoader(object):
             section.title = f"{section.title}{label_append}"
 
 
-def get_docstring(function):
+def get_docstring(function: Any) -> str:
     if hasattr(function, "__name__") or isinstance(function, property):
         return function.__doc__ or ""
     elif hasattr(function, "__call__"):
@@ -150,7 +133,9 @@ class CallableArg:
     type_hint: Optional[str]
     default: Optional[str]
 
-    def __init__(self, name: str, type_hint: Optional[str], default: Optional[str]):
+    def __init__(
+        self, name: str, type_hint: Optional[str], default: Optional[str]
+    ) -> None:
         self.name = name
         self.type_hint = type_hint
         self.default = default
@@ -159,7 +144,7 @@ class CallableArg:
 class CallablePlaceholder:
     simple: str
     name: str
-    args: List[CallableArg]
+    args: list[CallableArg]
     return_type: Optional[str]
     fn_type: FunctionTypes
 
@@ -167,10 +152,10 @@ class CallablePlaceholder:
         self,
         simple: str,
         name: str,
-        args: List[CallableArg],
+        args: list[CallableArg],
         fn_type: FunctionTypes,
         return_type: Optional[Any] = None,
-    ):
+    ) -> None:
         self.simple = simple
         self.name = name
         self.args = args
@@ -202,13 +187,15 @@ def get_fn_type(function: Any) -> FunctionTypes:
 
 
 def get_callable_placeholder(
-    function: Callable, owner_class=None, show_module=False
+    function: Callable[..., Any],
+    owner_class: Optional[type] = None,
+    show_module: bool = False,
 ) -> CallablePlaceholder:
     isclass = inspect.isclass(function)
     orig_fn = function
 
     # Get base name.
-    name_parts = []
+    name_parts: list[str] = []
     if show_module:
         name_parts.append(function.__module__)
     if owner_class:
@@ -226,10 +213,10 @@ def get_callable_placeholder(
     sig = inspect.signature(function)
     fn_type: FunctionTypes = get_fn_type(orig_fn)
 
-    params = []
+    params: list[CallableArg] = []
     for p in sig.parameters.values():
-        annotation = None
-        default_value = None
+        annotation: Optional[str] = None
+        default_value: Optional[str] = None
         if p.annotation is not inspect._empty:  # type: ignore
             annotation = inspect.formatannotation(p.annotation)
         if p.default is not inspect._empty:  # type: ignore
@@ -241,7 +228,7 @@ def get_callable_placeholder(
             annotation = cleanup_type(annotation)
         params.append(CallableArg(p.name, annotation, default_value))
 
-    return_annotation = None
+    return_annotation: Optional[str] = None
     if sig.return_annotation is not inspect._empty:  # type: ignore
         return_annotation = inspect.formatannotation(sig.return_annotation)
     if return_annotation is not None:
@@ -256,12 +243,12 @@ def get_callable_placeholder(
 
 
 def get_function_signature(
-    function: Callable,
-    owner_class: Optional[Any] = None,
+    function: Callable[..., Any],
+    owner_class: Optional[type] = None,
     show_module: bool = False,
     indent: int = 4,
     max_width: int = 82,
-) -> Tuple[str, str]:
+) -> tuple[str, str]:
     """Return a tuple of the function signature and its function type string"""
     placeholder: CallablePlaceholder = get_callable_placeholder(
         function=function, owner_class=owner_class, show_module=show_module
