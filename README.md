@@ -6,7 +6,9 @@
 
 ## Installation
 
-    pip install mathy_pydoc
+```bash
+pip install mathy_pydoc
+```
 
 ## Usage
 
@@ -15,7 +17,9 @@ mathy_pydoc generates plain Markdown files from Python modules using the
 Supports the `+` syntax to include members of the module (or `++` to include
 members of the members, etc.)
 
-    mathy_pydoc mypackage+ mypackage.mymodule+ > docs.md
+```bash
+mathy_pydoc mypackage+ mypackage.mymodule+ > docs.md
+```
 
 ## Syntax
 
@@ -75,4 +79,3 @@ GitHub-style Markdown code-blocks with language annotations can be used.
     ```
 
 ---
-

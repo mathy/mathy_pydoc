@@ -1,31 +1,16 @@
 #!/bin/bash
 set -e
 
-# Build and deploy python package
-. .env/bin/activate
-git config --global user.email "justin@dujardinconsulting.com"
-git config --global user.name "justindujardin"
+echo "Running semantic-release (bump version, changelog, commit, tag, push)..."
+# semantic-release version exits 0 if a release was made, non-zero otherwise.
+# build_command in pyproject.toml runs "rm -rf dist && uv build" automatically.
+if uv run semantic-release version; then
+    echo "Publishing to PyPI..."
+    uv run twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} dist/* || true
+    rm -rf dist
 
-
-echo "Installing semantic-release requirements"
-npm install 
-echo "Updating build version"
-npx ts-node tools/set-build-version.ts
-
-echo "Build and publish to pypi..."
-rm -rf build dist
-echo "--- Install requirements"
-pip install twine wheel
-echo "--- Buid dists"
-python setup.py sdist bdist_wheel
-echo "--- Upload to PyPi"
-# NOTE: ignore errors on upload because our CI is dumb and tries to upload
-#       even if the version has already been uploaded. This isn't great, but
-#       works for now. Ideally the CI would not call this script unless the
-#       semver changed.
-set +e
-twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} dist/*
-rm -rf build dist
-
-echo "Running semantic-release"
-npx semantic-release
+    echo "Publishing dist artifacts to GitHub release..."
+    uv run semantic-release publish
+else
+    echo "No release needed (no qualifying commits since last release)."
+fi

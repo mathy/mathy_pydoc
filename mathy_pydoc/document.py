@@ -4,11 +4,13 @@ in separate documents and symbolic names. The final documentation is rendered
 from this structured representation.
 """
 
-from __future__ import print_function
+from __future__ import annotations
+
 import os
+from typing import IO, Any, Optional
 
 
-class Section(object):
+class Section:
     """
   A section represents a part of a #Document. It contains Markdown-formatted
   content that will be rendered into a file at some point.
@@ -28,21 +30,22 @@ class Section(object):
 
     def __init__(
         self,
-        doc,
-        identifier=None,
-        title=None,
-        depth=1,
-        content=None,
-        header_type="html",
-    ):
+        doc: Document,
+        identifier: Optional[str] = None,
+        title: Optional[str] = None,
+        depth: int = 1,
+        content: Optional[str] = None,
+        header_type: str = "html",
+    ) -> None:
         self.doc = doc
         self.identifier = identifier
         self.title = title
         self.depth = depth
         self.content = content if content is not None else "*Nothing to see here.*"
         self.header_type = header_type
+        self.loader_context: Optional[dict[str, Any]] = None
 
-    def render(self, stream):
+    def render(self, stream: IO[str]) -> None:
         """
     Render the section into *stream*.
     """
@@ -61,7 +64,7 @@ class Section(object):
         print(self.content, file=stream)
 
     @property
-    def index(self):
+    def index(self) -> Index:
         """
     Returns the #Index that this section is associated with, accessed via
     `section.document`.
@@ -70,7 +73,7 @@ class Section(object):
         return self.document.index
 
 
-class Document(object):
+class Document:
     """
   Represents a single document that may contain several #Section#s. Every
   document *must* have a relative URL associated with it.
@@ -80,13 +83,13 @@ class Document(object):
   url (str): The relative URL of the document.
   """
 
-    def __init__(self, index, url):
+    def __init__(self, index: Index, url: str) -> None:
         self.index = index
         self.url = url
-        self.sections = []
+        self.sections: list[Section] = []
 
 
-class Index(object):
+class Index:
     """
   The index manages all documents and sections globally. It keeps track of
   the symbolic names allocated for the sections to be able to link to them
@@ -97,11 +100,11 @@ class Index(object):
   sections (dict):
   """
 
-    def __init__(self):
-        self.documents = {}
-        self.sections = {}
+    def __init__(self) -> None:
+        self.documents: dict[str, Document] = {}
+        self.sections: dict[str, Section] = {}
 
-    def new_document(self, filename, url=None):
+    def new_document(self, filename: str, url: Optional[str] = None) -> Document:
         """
     Create a new document.
 
@@ -129,7 +132,7 @@ class Index(object):
         self.documents[filename] = doc
         return doc
 
-    def new_section(self, doc, *args, **kwargs):
+    def new_section(self, doc: Document, *args: Any, **kwargs: Any) -> Section:
         """
     Create a new section in the specified document. The arguments for this
     method match the parameters for the #Section constructor.

@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
-rm -rf .env/
 rm -rf .pytest_cache/
-rm -rf pydoc_markdown.egg-info/
+rm -rf mathy_pydoc.egg-info/
+rm -rf dist/ build/

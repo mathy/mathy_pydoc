@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, List, Union
+from typing import Union
 
 import typer
 
@@ -11,7 +11,7 @@ from .preprocessor import Preprocessor
 app = typer.Typer()
 
 
-def default_config(config):
+def default_config(config: dict[str, object]) -> dict[str, object]:
     config.setdefault("sort", "name")
     config.setdefault("headers", "markdown")
     config.setdefault("theme", "readthedocs")
@@ -21,13 +21,13 @@ def default_config(config):
     return config
 
 
-def log(*args, **kwargs):
+def log(*args: object, **kwargs: object) -> None:
     kwargs.setdefault("file", sys.stderr)
     print(*args, **kwargs)
 
 
 @app.command()
-def main(names: List[str], plain: bool = False):
+def main(names: list[str], plain: bool = False) -> int:
     names = list(names)
     config = default_config({})
     loader = PythonLoader(LoaderConfig(plain=plain))
@@ -40,9 +40,9 @@ def main(names: List[str], plain: bool = False):
 
     def add_sections(
         doc: Document,
-        object_names: Union[List[str], Dict[str, str], str],
+        object_names: Union[list[str], dict[str, str], str],
         depth: int = 1,
-    ):
+    ) -> None:
         if isinstance(object_names, list):
             [add_sections(doc, x, depth) for x in object_names]
         elif isinstance(object_names, dict):
@@ -55,7 +55,7 @@ def main(names: List[str], plain: bool = False):
             object_names = object_names.rstrip("+")
             expand_depth -= len(object_names)
 
-            def create_sections(name, level):
+            def create_sections(name: str, level: int) -> None:
                 if level > expand_depth:
                     return
                 index.new_section(

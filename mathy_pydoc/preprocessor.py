@@ -4,23 +4,26 @@ it to fully markdown compatible markup.
 """
 
 import re
+from typing import Any, Optional
+
+from .document import Section
 
 
-class Preprocessor(object):
+class Preprocessor:
     """
   This class implements the basic preprocessing.
   """
 
-    def __init__(self, config):
+    def __init__(self, config: dict[str, Any]) -> None:
         self.config = config
 
-    def preprocess_section(self, section):
+    def preprocess_section(self, section: Section) -> None:
         """
     Preprocess the contents of *section*.
     """
-        lines = []
+        lines: list[str] = []
         codeblock_opened = False
-        current_section = None
+        current_section: Optional[str] = None
         for line in section.content.split("\n"):
             if line.startswith("```"):
                 codeblock_opened = not codeblock_opened
@@ -29,7 +32,9 @@ class Preprocessor(object):
             lines.append(line)
         section.content = self._preprocess_refs("\n".join(lines))
 
-    def _preprocess_line(self, line, current_section):
+    def _preprocess_line(
+        self, line: str, current_section: Optional[str]
+    ) -> tuple[str, Optional[str]]:
         match = re.match(r"# (.*)$", line)
         if match:
             current_section = match.group(1).strip().lower()
@@ -50,9 +55,9 @@ class Preprocessor(object):
 
         return line, current_section
 
-    def _preprocess_refs(self, content):
+    def _preprocess_refs(self, content: str) -> str:
         # TODO: Generate links to the referenced symbols.
-        def handler(match):
+        def handler(match: re.Match[str]) -> str:
             ref = match.group("ref")
             parens = match.group("parens") or ""
             has_trailing_dot = False
@@ -67,4 +72,3 @@ class Preprocessor(object):
         return re.sub(
             "(?P<prefix>^| |\t)#(?P<ref>[\w\d\._]+)(?P<parens>\(\))?", handler, content
         )
-
